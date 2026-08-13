@@ -1,0 +1,128 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+@source "../../templates/**/*.html";
+@source "../js/**/*.js";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-ink-950: #070d0a;
+  --color-ink-900: #0b1310;
+  --color-ink-800: #111c18;
+  --color-ink-700: #1c2b25;
+  --color-ink-600: #2e423a;
+  --color-ink-500: #4a5f56;
+  --color-ink-400: #7a8f86;
+  --color-ink-300: #aebdb6;
+  --color-ink-200: #d4ddd9;
+  --color-ink-100: #e9eeec;
+
+  --color-forest-950: #04231b;
+  --color-forest-900: #06382c;
+  --color-forest-800: #094b3a;
+  --color-forest-700: #0c5f48;
+  --color-forest-600: #107458;
+  --color-forest-500: #17896a;
+  --color-forest-400: #2fa985;
+  --color-forest-300: #6ec8a9;
+  --color-forest-200: #aee0cd;
+  --color-forest-100: #d8f1e7;
+  --color-forest-50: #effaf6;
+
+  --color-gold-700: #8a6a24;
+  --color-gold-600: #a9832f;
+  --color-gold-500: #c49c3e;
+  --color-gold-400: #d6b45e;
+  --color-gold-300: #e6cf8d;
+  --color-gold-200: #f2e5c0;
+
+  --color-paper-50: #fcfcfa;
+  --color-paper-100: #f6f7f3;
+  --color-paper-200: #edeeda;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-paper-50 font-sans text-ink-900 antialiased;
+  }
+  ::selection {
+    @apply bg-forest-500 text-white;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-forest-500/70 ring-offset-2 ring-offset-paper-50;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply bg-forest-800 text-white shadow-sm hover:bg-forest-700 hover:shadow-lg hover:shadow-forest-900/25 active:scale-[0.98];
+  }
+  .btn-gold {
+    @apply bg-gold-400 text-ink-950 shadow-sm hover:bg-gold-300 hover:shadow-lg hover:shadow-gold-500/30 active:scale-[0.98];
+  }
+  .btn-outline {
+    @apply border border-ink-900/15 bg-white text-ink-900 hover:border-forest-600 hover:text-forest-700;
+  }
+  .btn-ghost {
+    @apply text-ink-700 hover:bg-ink-900/5 hover:text-forest-800;
+  }
+  .btn-danger {
+    @apply bg-red-50 text-red-700 hover:bg-red-100;
+  }
+  .field {
+    @apply w-full rounded-xl border border-ink-900/10 bg-white px-4 py-2.5 text-sm text-ink-900 shadow-[0_1px_2px_rgba(7,13,10,0.03)] transition placeholder:text-ink-900/35 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/40;
+  }
+  .label {
+    @apply mb-1.5 block text-[13px] font-semibold text-ink-800;
+  }
+  .card {
+    @apply rounded-2xl border border-ink-900/8 bg-white shadow-[0_1px_2px_rgba(7,13,10,0.05)];
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+  }
+  .container-x {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .prose-resuma {
+    @apply text-[15px] leading-relaxed text-ink-600;
+  }
+  .prose-resuma p {
+    @apply mb-4;
+  }
+  .nav-link {
+    @apply rounded-lg px-3 py-2 text-sm font-medium text-ink-600 transition hover:text-forest-800;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  .bg-grid-dark {
+    background-image:
+      linear-gradient(to right, rgba(7, 13, 10, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(7, 13, 10, 0.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  .glow-forest {
+    box-shadow: 0 0 120px -20px rgba(23, 137, 106, 0.5);
+  }
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent);
+    mask-image: linear-gradient(to bottom, black 55%, transparent);
+  }
+}
