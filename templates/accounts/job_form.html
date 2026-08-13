@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}{% if edit %}Edit job{% else %}Post a job{% endif %} — {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="border-b border-ink-900/5 bg-white">
+  <div class="container-x py-10">
+    <nav class="text-xs text-ink-400" aria-label="Breadcrumb">
+      <a href="{% url 'accounts:employer_dashboard' %}" class="hover:text-forest-700">Dashboard</a>
+      <span class="mx-1.5">/</span>
+      <span class="text-ink-700">{% if edit %}Edit job{% else %}Post a job{% endif %}</span>
+    </nav>
+    <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-ink-950">
+      {% if edit %}Edit “{{ form.instance.title }}”{% else %}Post a new job{% endif %}
+    </h1>
+    <p class="mt-2 text-sm text-ink-500">Publishing as <span class="font-semibold text-ink-900">{{ company.name }}</span></p>
+  </div>
+</section>
+
+<div class="container-x py-10">
+  <form method="post" class="mx-auto max-w-3xl space-y-6" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <p class="card border-l-4 border-l-red-500 px-4 py-3 text-sm text-red-700">{{ form.non_field_errors.0 }}</p>
+    {% endif %}
+
+    <div class="card p-6 sm:p-8">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-ink-400">Basics</h2>
+      <div class="mt-5 grid gap-5 sm:grid-cols-2">
+        <div class="sm:col-span-2">
+          <label class="label" for="{{ form.title.id_for_label }}">Job title <span class="text-red-500">*</span></label>
+          {{ form.title|add_class:"field" }}
+          {% for error in form.title.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="label" for="{{ form.category.id_for_label }}">Category <span class="text-red-500">*</span></label>
+          {{ form.category|add_class:"field" }}
+          {% for error in form.category.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="label" for="{{ form.job_type.id_for_label }}">Job type <span class="text-red-500">*</span></label>
+          {{ form.job_type|add_class:"field" }}
+          {% for error in form.job_type.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="label" for="{{ form.experience_level.id_for_label }}">Experience level <span class="text-red-500">*</span></label>
+          {{ form.experience_level|add_class:"field" }}
+          {% for error in form.experience_level.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="label" for="{{ form.city.id_for_label }}">City <span class="text-red-500">*</span></label>
+          {{ form.city|add_class:"field" }}
+          {% for error in form.city.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+      <label class="mt-5 flex cursor-pointer items-center gap-3 text-sm font-medium text-ink-700">
+        {{ form.is_remote }}
+        <span>This role is fully remote</span>
+      </label>
+    </div>
+
+    <div class="card p-6 sm:p-8">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-ink-400">Salary (optional)</h2>
+      <div class="mt-5 grid gap-5 sm:grid-cols-3">
+        <div>
+          <label class="label" for="{{ form.salary_min.id_for_label }}">Min (PKR)</label>
+          {{ form.salary_min|add_class:"field" }}
+          {% for error in form.salary_min.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="label" for="{{ form.salary_max.id_for_label }}">Max (PKR)</label>
+          {{ form.salary_max|add_class:"field" }}
+          {% for error in form.salary_max.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="label" for="{{ form.salary_period.id_for_label }}">Period</label>
+          {{ form.salary_period|add_class:"field" }}
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-6 sm:p-8">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-ink-400">Description</h2>
+      <div class="mt-5 space-y-5">
+        <div>
+          <label class="label" for="{{ form.description.id_for_label }}">What the job involves <span class="text-red-500">*</span></label>
+          {{ form.description|add_class:"field" }}
+          {% for error in form.description.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="label" for="{{ form.responsibilities.id_for_label }}">Responsibilities</label>
+          {{ form.responsibilities|add_class:"field" }}
+          <p class="mt-1 text-xs text-ink-400">One bullet point per line.</p>
+        </div>
+        <div>
+          <label class="label" for="{{ form.requirements.id_for_label }}">Requirements</label>
+          {{ form.requirements|add_class:"field" }}
+          <p class="mt-1 text-xs text-ink-400">One bullet point per line.</p>
+        </div>
+        <div>
+          <label class="label" for="{{ form.skills.id_for_label }}">Skills</label>
+          {{ form.skills|add_class:"field" }}
+          <p class="mt-1 text-xs text-ink-400">Comma-separated, e.g. Django, Python, SQL.</p>
+        </div>
+        <div>
+          <label class="label" for="{{ form.deadline.id_for_label }}">Application deadline</label>
+          {{ form.deadline|add_class:"field" }}
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-6 sm:p-8">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-ink-400">How should candidates apply?</h2>
+      <div class="mt-5 grid gap-5 sm:grid-cols-2">
+        <div>
+          <label class="label" for="{{ form.apply_method.id_for_label }}">Method <span class="text-red-500">*</span></label>
+          {{ form.apply_method|add_class:"field" }}
+        </div>
+        <div>
+          <label class="label" for="{{ form.apply_email.id_for_label }}">Application email</label>
+          {{ form.apply_email|add_class:"field" }}
+          {% for error in form.apply_email.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="sm:col-span-2">
+          <label class="label" for="{{ form.apply_url.id_for_label }}">External application URL</label>
+          {{ form.apply_url|add_class:"field" }}
+          <p class="mt-1 text-xs text-ink-400">Candidates using the on-site form also appear in your dashboard.</p>
+          {% for error in form.apply_url.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap justify-end gap-3 pb-4">
+      <a href="{% url 'accounts:employer_dashboard' %}" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary !px-8">
+        {% if edit %}Save changes{% else %}Publish job{% endif %}
+        {% include "partials/icon.html" with name="arrow-right" %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

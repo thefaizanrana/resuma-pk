@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Sign in — {{ site_name }}{% endblock %}
+{% block content %}
+<section class="container-x flex items-center justify-center py-16 sm:py-24">
+  <div class="w-full max-w-md">
+    <div class="card p-8">
+      <div class="text-center">
+        <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-forest-700 to-forest-900 shadow-md shadow-forest-900/20">
+          <svg viewBox="0 0 24 24" fill="none" class="h-6 w-6 text-gold-400" aria-hidden="true">
+            <path d="M5 4h8.5A4.5 4.5 0 0 1 18 8.5 4.5 4.5 0 0 1 13.5 13H5V4Zm0 13h13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="14.5" cy="8.5" r="1.6" fill="currentColor"/>
+          </svg>
+        </span>
+        <h1 class="mt-5 text-2xl font-bold tracking-tight text-ink-950">Welcome back</h1>
+        <p class="mt-1.5 text-sm text-ink-500">Sign in to continue your job search.</p>
+      </div>
+
+      <form method="post" class="mt-7 space-y-4" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <p class="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{{ form.non_field_errors.0 }}</p>
+        {% endif %}
+        <div>
+          <label class="label" for="{{ form.username.id_for_label }}">Email</label>
+          {{ form.username|add_class:"field" }}
+          {% for error in form.username.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="label" for="{{ form.password.id_for_label }}">Password</label>
+          {{ form.password|add_class:"field" }}
+          {% for error in form.password.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary w-full !py-3">Sign in</button>
+      </form>
+
+      <p class="mt-6 text-center text-sm text-ink-500">
+        New to {{ site_name }}?
+        <a href="{% url 'accounts:register' %}" class="font-semibold text-forest-700 hover:text-forest-800">Create an account</a>
+      </p>
+    </div>
+    <p class="mt-4 text-center text-xs text-ink-400">
+      Protected by 256-bit SSL encryption · We never share your data
+    </p>
+  </div>
+</section>
+{% endblock %}

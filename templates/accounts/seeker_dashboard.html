@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load jobs_extras %}
+
+{% block title %}My dashboard — {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="border-b border-ink-900/5 bg-white">
+  <div class="container-x flex flex-wrap items-center justify-between gap-6 py-12">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-forest-600">Job seeker dashboard</p>
+      <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-ink-950">Hi, {{ user.first_name|default:user.username }}</h1>
+      <p class="mt-1.5 text-sm text-ink-500">
+        {% if profile.title %}{{ profile.title }}{% if profile.city %} · {{ profile.city }}{% endif %}{% else %}Complete your profile to get noticed.{% endif %}
+      </p>
+    </div>
+    <div class="flex gap-2.5">
+      <a href="{% url 'accounts:profile' %}" class="btn btn-outline">
+        {% include "partials/icon.html" with name="doc" %}Edit profile
+      </a>
+      <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">Find jobs {% include "partials/icon.html" with name="arrow-right" %}</a>
+    </div>
+  </div>
+</section>
+
+<div class="container-x grid gap-4 py-10 sm:grid-cols-3">
+  <div class="card p-6">
+    <p class="text-sm text-ink-500">Applications sent</p>
+    <p class="mt-1.5 text-3xl font-extrabold tracking-tight text-forest-700">{{ applications.count }}</p>
+  </div>
+  <div class="card p-6">
+    <p class="text-sm text-ink-500">Saved jobs</p>
+    <p class="mt-1.5 text-3xl font-extrabold tracking-tight text-ink-950">{{ saved_jobs.count }}</p>
+  </div>
+  <div class="card p-6">
+    <p class="text-sm text-ink-500">Resume</p>
+    <p class="mt-1.5 truncate text-lg font-bold text-gold-600">
+      {% if profile and profile.resume %}Uploaded{% else %}Not uploaded{% endif %}
+    </p>
+  </div>
+</div>
+
+<div class="container-x grid gap-8 pb-16 lg:grid-cols-2">
+  <!-- Applications -->
+  <section aria-labelledby="apps-title">
+    <h2 id="apps-title" class="text-lg font-bold text-ink-950">My applications</h2>
+    {% if applications %}
+      <div class="mt-4 space-y-3">
+        {% for app in applications %}
+          <div class="card p-5">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="min-w-0">
+                <a href="{{ app.job.get_absolute_url }}" class="font-semibold text-ink-950 hover:text-forest-700">{{ app.job.title }}</a>
+                <p class="mt-0.5 text-sm text-ink-500">{{ app.job.company.name }} · {{ app.job.city }} · applied {{ app.applied_at|date:"M j, Y" }}</p>
+              </div>
+              <span class="chip {% if app.status == 'hired' %}bg-forest-50 text-forest-700{% elif app.status == 'rejected' %}bg-red-50 text-red-700{% else %}bg-gold-200/60 text-gold-700{% endif %}">
+                {{ app.get_status_display }}
+              </span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card mt-4 flex flex-col items-center px-6 py-12 text-center">
+        <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest-50 text-forest-600">
+          {% include "partials/icon.html" with name="briefcase" class="h-5 w-5" %}
+        </span>
+        <p class="mt-3 text-sm font-medium text-ink-700">No applications yet</p>
+        <a href="{% url 'jobs:job_list' %}" class="btn btn-primary mt-4 !py-2 text-xs">Start applying</a>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- Saved jobs -->
+  <section aria-labelledby="saved-title">
+    <h2 id="saved-title" class="text-lg font-bold text-ink-950">Saved jobs</h2>
+    {% if saved_jobs %}
+      <div class="mt-4 space-y-3">
+        {% for saved in saved_jobs %}
+          <div class="card p-5">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="min-w-0">
+                <a href="{{ saved.job.get_absolute_url }}" class="font-semibold text-ink-950 hover:text-forest-700">{{ saved.job.title }}</a>
+                <p class="mt-0.5 text-sm text-ink-500">{{ saved.job.company.name }} · {{ saved.job.city }} · {{ saved.job|salary_short }}</p>
+              </div>
+              <span class="text-xs text-ink-400">Saved {{ saved.saved_at|timesince }} ago</span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card mt-4 flex flex-col items-center px-6 py-12 text-center">
+        <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold-200/60 text-gold-700">
+          {% include "partials/icon.html" with name="bookmark" class="h-5 w-5" %}
+        </span>
+        <p class="mt-3 text-sm font-medium text-ink-700">Nothing saved yet</p>
+        <p class="mt-1 text-xs text-ink-400">Tap the bookmark icon on any job to save it here.</p>
+      </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% load jobs_extras %}
+
+{% block title %}{{ job.title }} at {{ job.company.name }} — {{ site_name }}{% endblock %}
+{% block description %}{{ job.company.name }} is hiring {{ job.title }} in {{ job.city }}. Apply via {{ site_name }}.{% endblock %}
+
+{% block content %}
+<section class="border-b border-ink-900/5 bg-white">
+  <div class="container-x py-8">
+    <nav class="text-xs text-ink-400" aria-label="Breadcrumb">
+      <a href="{% url 'jobs:home' %}" class="hover:text-forest-700">Home</a>
+      <span class="mx-1.5">/</span>
+      <a href="{% url 'jobs:job_list' %}" class="hover:text-forest-700">Jobs</a>
+      <span class="mx-1.5">/</span>
+      <span class="text-ink-700">{{ job.title }}</span>
+    </nav>
+
+    <div class="mt-6 flex flex-col gap-6 md:flex-row md:items-start">
+      <a href="{{ job.company.get_absolute_url }}" class="shrink-0">
+        {% if job.company.logo %}
+          <img src="{{ job.company.logo.url }}" alt="{{ job.company.name }}" width="72" height="72"
+               class="h-[72px] w-[72px] rounded-2xl border border-ink-900/8 object-cover" loading="lazy">
+        {% else %}
+          {% company_logo job.company "h-[72px] w-[72px] text-xl" %}
+        {% endif %}
+      </a>
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-2">
+          {% if job.is_featured %}
+            <span class="chip bg-gold-200/70 text-gold-700">
+              {% include "partials/icon.html" with name="spark" class="h-3 w-3" %}Featured
+            </span>
+          {% endif %}
+          {% if job.is_remote %}
+            <span class="chip bg-forest-50 text-forest-700">Fully remote</span>
+          {% endif %}
+          <span class="chip bg-ink-100 text-ink-700">{{ job.get_experience_level_display }}</span>
+        </div>
+        <h1 class="mt-2.5 text-2xl font-extrabold tracking-tight text-ink-950 sm:text-3xl">{{ job.title }}</h1>
+        <a href="{{ job.company.get_absolute_url }}" class="mt-1.5 inline-block text-[15px] font-medium text-forest-700 hover:text-forest-800">
+          {{ job.company.name }}
+        </a>
+      </div>
+      <div class="flex shrink-0 flex-col gap-2.5 sm:flex-row md:flex-col lg:flex-row">
+        {% if request.user.is_authenticated %}
+          <button type="button" class="btn btn-outline" data-save-job="{{ job.slug }}"
+                  data-url="{% url 'jobs:save_job' job.slug %}"
+                  aria-pressed="{% if is_saved %}true{% else %}false{% endif %}">
+            <span class="{% if is_saved %}text-forest-600{% else %}text-ink-400{% endif %}" data-save-icon>
+              {% if is_saved %}{% include "partials/icon.html" with name="bookmark-filled" %}{% else %}{% include "partials/icon.html" with name="bookmark" %}{% endif %}
+            </span>
+            <span data-save-text>{% if is_saved %}Saved{% else %}Save job{% endif %}</span>
+          </button>
+        {% endif %}
+        {% if job.apply_method == "url" and job.apply_url %}
+          <a href="{{ job.apply_url }}" target="_blank" rel="noopener noreferrer nofollow" class="btn btn-primary">
+            Apply on website {% include "partials/icon.html" with name="external" %}
+          </a>
+        {% elif has_applied %}
+          <span class="btn btn-outline cursor-default !text-forest-700">
+            {% include "partials/icon.html" with name="check" %}Applied
+          </span>
+        {% else %}
+          <button type="button" class="btn btn-primary" data-open-apply>Apply now {% include "partials/icon.html" with name="arrow-right" %}</button>
+        {% endif %}
+      </div>
+    </div>
+
+    <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-ink-900/5 pt-6 sm:grid-cols-4">
+      <div>
+        <dt class="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-ink-400">
+          {% include "partials/icon.html" with name="location" class="h-3.5 w-3.5" %}Location
+        </dt>
+        <dd class="mt-1 text-sm font-semibold text-ink-900">{{ job.location_display }}</dd>
+      </div>
+      <div>
+        <dt class="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-ink-400">
+          {% include "partials/icon.html" with name="briefcase" class="h-3.5 w-3.5" %}Type
+        </dt>
+        <dd class="mt-1 text-sm font-semibold text-ink-900">{{ job.get_job_type_display }}</dd>
+      </div>
+      <div>
+        <dt class="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-ink-400">
+          {% include "partials/icon.html" with name="banknote" class="h-3.5 w-3.5" %}Salary
+        </dt>
+        <dd class="mt-1 text-sm font-semibold text-ink-900">{{ job.salary_display }}</dd>
+      </div>
+      <div>
+        <dt class="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-ink-400">
+          {% include "partials/icon.html" with name="clock" class="h-3.5 w-3.5" %}Posted
+        </dt>
+        <dd class="mt-1 text-sm font-semibold text-ink-900">{{ job.posted_at|date:"M j, Y" }}</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<div class="container-x grid gap-10 py-10 lg:grid-cols-[1fr_320px]">
+  <article class="min-w-0">
+    <h2 class="text-lg font-bold text-ink-950">Job description</h2>
+    <div class="prose-resuma mt-4">{{ job.description|linebreaks }}</div>
+
+    {% if job.responsibilities %}
+      <h3 class="mt-8 text-lg font-bold text-ink-950">Responsibilities</h3>
+      <ul class="mt-3 space-y-2">
+        {% for line in job.responsibilities.splitlines %}
+          {% if line|striptags|cut:" " %}
+            <li class="flex gap-3 text-[15px] leading-relaxed text-ink-600">
+              <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-forest-600"></span>{{ line }}
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if job.requirements %}
+      <h3 class="mt-8 text-lg font-bold text-ink-950">Requirements</h3>
+      <ul class="mt-3 space-y-2">
+        {% for line in job.requirements.splitlines %}
+          {% if line|striptags|cut:" " %}
+            <li class="flex gap-3 text-[15px] leading-relaxed text-ink-600">
+              <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold-500"></span>{{ line }}
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if job.skills %}
+      <h3 class="mt-8 text-lg font-bold text-ink-950">Skills</h3>
+      <div class="mt-3 flex flex-wrap gap-2">
+        {% for skill in job.skills.split %}
+          <span class="chip bg-ink-100 text-ink-700">{{ skill|cut:"," }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if job.deadline %}
+      <p class="mt-8 inline-flex items-center gap-2 rounded-xl bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700">
+        {% include "partials/icon.html" with name="calendar" %}Apply before {{ job.deadline|date:"F j, Y" }}
+      </p>
+    {% endif %}
+  </article>
+
+  <aside class="space-y-5 lg:sticky lg:top-24 lg:self-start">
+    <div class="card p-5">
+      <h2 class="text-sm font-bold text-ink-950">About {{ job.company.name }}</h2>
+      <p class="mt-2.5 text-sm leading-relaxed text-ink-500">
+        {{ job.company.description|truncatechars:160|default:"This company is hiring on Resuma.pk." }}
+      </p>
+      {% if job.company.industry %}
+        <p class="mt-3 text-sm text-ink-500"><span class="font-semibold text-ink-800">Industry:</span> {{ job.company.industry }}</p>
+      {% endif %}
+      <a href="{{ job.company.get_absolute_url }}" class="btn btn-outline mt-4 w-full">
+        View company {% include "partials/icon.html" with name="arrow-right" %}
+      </a>
+    </div>
+
+    <div class="card p-5">
+      <h2 class="text-sm font-bold text-ink-950">Job summary</h2>
+      <dl class="mt-3 space-y-2.5 text-sm">
+        <div class="flex justify-between gap-3"><dt class="text-ink-500">Category</dt><dd class="font-medium text-ink-900">{{ job.get_category_display }}</dd></div>
+        <div class="flex justify-between gap-3"><dt class="text-ink-500">Experience</dt><dd class="font-medium text-ink-900">{{ job.get_experience_level_display }}</dd></div>
+        <div class="flex justify-between gap-3"><dt class="text-ink-500">City</dt><dd class="font-medium text-ink-900">{{ job.city }}</dd></div>
+        <div class="flex justify-between gap-3"><dt class="text-ink-500">Views</dt><dd class="font-medium text-ink-900">{{ job.views }}</dd></div>
+      </dl>
+    </div>
+  </aside>
+</div>
+
+<!-- ============ RELATED ============ -->
+{% if related_jobs %}
+<section class="border-t border-ink-900/5 bg-white py-14">
+  <div class="container-x">
+    <h2 class="text-xl font-bold tracking-tight text-ink-950">Similar jobs</h2>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {% for job in related_jobs %}
+        {% include "partials/job_card.html" %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ============ APPLY MODAL ============ -->
+{% if not has_applied and not job.apply_url %}
+<div class="fixed inset-0 z-[60] hidden items-center justify-center bg-ink-950/60 p-4 backdrop-blur-sm" data-modal data-apply-modal role="dialog" aria-modal="true" aria-labelledby="apply-title">
+  <div class="card max-h-[90vh] w-full max-w-lg overflow-y-auto p-6 sm:p-8">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-forest-600">Application</p>
+        <h2 id="apply-title" class="mt-1.5 text-xl font-bold text-ink-950">{{ job.title }}</h2>
+        <p class="mt-0.5 text-sm text-ink-500">{{ job.company.name }} · {{ job.city }}</p>
+      </div>
+      <button type="button" class="btn btn-ghost !px-2.5" data-close-apply aria-label="Close">
+        {% include "partials/icon.html" with name="x" class="h-5 w-5" %}
+      </button>
+    </div>
+
+    {% if not request.user.is_authenticated %}
+      <div class="mt-6 rounded-xl bg-forest-50 p-5 text-sm text-forest-800">
+        <p class="font-semibold">Sign in to apply</p>
+        <p class="mt-1 text-forest-700">Create a free account to apply for this job in under a minute.</p>
+        <div class="mt-4 flex gap-2.5">
+          <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-primary">Sign in</a>
+          <a href="{% url 'accounts:register' %}" class="btn btn-outline">Create account</a>
+        </div>
+      </div>
+    {% else %}
+      <form method="post" action="{% url 'jobs:apply_job' job.slug %}" enctype="multipart/form-data" class="mt-6 space-y-4">
+        {% csrf_token %}
+        {% for field in apply_form %}
+          <div>
+            <label class="label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<p class="mt-1 text-xs text-ink-400">{{ field.help_text }}</p>{% endif %}
+            {% for error in field.errors %}
+              <p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endfor %}
+        {% if apply_form.non_field_errors %}
+          <p class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ apply_form.non_field_errors.0 }}</p>
+        {% endif %}
+        <button type="submit" class="btn btn-primary w-full !py-3">
+          Submit application {% include "partials/icon.html" with name="arrow-right" %}
+        </button>
+        <p class="text-center text-xs text-ink-400">Your resume is shared only with {{ job.company.name }}.</p>
+      </form>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

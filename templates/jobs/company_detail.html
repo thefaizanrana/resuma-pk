@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load jobs_extras %}
+
+{% block title %}{{ company.name }} — {{ site_name }}{% endblock %}
+{% block description %}{{ company.tagline|default:company.name }} — {{ company.job_count }} open positions on Resuma.pk.{% endblock %}
+
+{% block content %}
+<section class="relative overflow-hidden border-b border-ink-900/5 bg-ink-950 text-white">
+  <div class="absolute inset-0 bg-grid mask-fade-b" aria-hidden="true"></div>
+  <div class="absolute -top-32 left-1/4 h-64 w-96 rounded-full bg-forest-600/25 blur-[110px]" aria-hidden="true"></div>
+  <div class="container-x relative py-14">
+    <nav class="text-xs text-ink-400" aria-label="Breadcrumb">
+      <a href="{% url 'jobs:home' %}" class="hover:text-forest-300">Home</a>
+      <span class="mx-1.5">/</span>
+      <a href="{% url 'jobs:company_list' %}" class="hover:text-forest-300">Companies</a>
+      <span class="mx-1.5">/</span>
+      <span class="text-ink-300">{{ company.name }}</span>
+    </nav>
+
+    <div class="mt-8 flex flex-col gap-6 md:flex-row md:items-center">
+      {% if company.logo %}
+        <img src="{{ company.logo.url }}" alt="{{ company.name }}" width="88" height="88"
+             class="h-22 w-22 shrink-0 rounded-2xl border border-white/10 object-cover">
+      {% else %}
+        {% company_logo company "h-22 w-22 text-2xl shrink-0" %}
+      {% endif %}
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <h1 class="text-3xl font-extrabold tracking-tight">{{ company.name }}</h1>
+          {% if company.verified %}
+            <span class="chip border border-gold-400/30 bg-gold-400/15 text-gold-300">
+              {% include "partials/icon.html" with name="shield" class="h-3 w-3" %}Verified
+            </span>
+          {% endif %}
+        </div>
+        {% if company.tagline %}
+          <p class="mt-2 text-[15px] text-ink-300">{{ company.tagline }}</p>
+        {% endif %}
+        <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-300">
+          {% if company.city %}<span class="inline-flex items-center gap-1.5">{% include "partials/icon.html" with name="location" class="h-4 w-4 text-forest-400" %}{{ company.city }}</span>{% endif %}
+          {% if company.industry %}<span class="inline-flex items-center gap-1.5">{% include "partials/icon.html" with name="briefcase" class="h-4 w-4 text-forest-400" %}{{ company.industry }}</span>{% endif %}
+          {% if company.employees %}<span class="inline-flex items-center gap-1.5">{% include "partials/icon.html" with name="users" class="h-4 w-4 text-forest-400" %}{{ company.employees }} employees</span>{% endif %}
+          {% if company.website %}<a href="{{ company.website }}" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-1.5 transition hover:text-forest-300">{% include "partials/icon.html" with name="globe" class="h-4 w-4 text-forest-400" %}Website</a>{% endif %}
+        </div>
+      </div>
+      <div class="shrink-0">
+        <p class="text-center text-4xl font-extrabold text-gold-300">{{ company.job_count }}</p>
+        <p class="text-center text-xs uppercase tracking-widest text-ink-400">open jobs</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container-x grid gap-10 py-10 lg:grid-cols-[1fr_320px]">
+  <div class="min-w-0">
+    <h2 class="text-lg font-bold text-ink-950">Open positions</h2>
+    <div class="mt-5 grid gap-4 sm:grid-cols-2">
+      {% for job in jobs %}
+        {% include "partials/job_card.html" %}
+      {% empty %}
+        <div class="card col-span-full flex flex-col items-center px-6 py-14 text-center">
+          <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest-50 text-forest-600">
+            {% include "partials/icon.html" with name="briefcase" class="h-5 w-5" %}
+          </span>
+          <p class="mt-3.5 font-semibold text-ink-900">No open positions right now</p>
+          <p class="mt-1 max-w-xs text-sm text-ink-500">Check back soon — new roles are posted regularly.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <aside class="space-y-5 lg:sticky lg:top-24 lg:self-start">
+    <div class="card p-6">
+      <h2 class="text-sm font-bold text-ink-950">About {{ company.name }}</h2>
+      {% if company.description %}
+        <div class="prose-resuma mt-3">{{ company.description|linebreaks }}</div>
+      {% else %}
+        <p class="mt-3 text-sm text-ink-500">This company hasn't shared a description yet.</p>
+      {% endif %}
+      <dl class="mt-5 space-y-2.5 border-t border-ink-900/5 pt-4 text-sm">
+        {% if company.founded %}
+          <div class="flex justify-between gap-3"><dt class="text-ink-500">Founded</dt><dd class="font-medium text-ink-900">{{ company.founded }}</dd></div>
+        {% endif %}
+        {% if company.industry %}
+          <div class="flex justify-between gap-3"><dt class="text-ink-500">Industry</dt><dd class="font-medium text-ink-900">{{ company.industry }}</dd></div>
+        {% endif %}
+        {% if company.employees %}
+          <div class="flex justify-between gap-3"><dt class="text-ink-500">Size</dt><dd class="font-medium text-ink-900">{{ company.employees }}</dd></div>
+        {% endif %}
+        {% if company.website %}
+          <div class="flex justify-between gap-3">
+            <dt class="text-ink-500">Website</dt>
+            <dd><a href="{{ company.website }}" target="_blank" rel="noopener noreferrer nofollow" class="font-medium text-forest-700 hover:text-forest-800">{{ company.website|cut:"https://"|cut:"http://"|truncatechars:24 }}</a></dd>
+          </div>
+        {% endif %}
+      </dl>
+    </div>
+    <div class="card p-6 text-center">
+      <p class="text-sm font-semibold text-ink-900">Work at {{ company.name }}?</p>
+      <p class="mt-1 text-xs text-ink-500">Register as an employer to manage this profile and post jobs.</p>
+      <a href="{% url 'accounts:register_employer' %}" class="btn btn-outline mt-4 w-full">Employer sign up</a>
+    </div>
+  </aside>
+</div>
+{% endblock %}

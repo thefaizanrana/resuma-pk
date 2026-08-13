@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Company profile — {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="border-b border-ink-900/5 bg-white">
+  <div class="container-x py-10">
+    <nav class="text-xs text-ink-400" aria-label="Breadcrumb">
+      <a href="{% url 'accounts:employer_dashboard' %}" class="hover:text-forest-700">Dashboard</a>
+      <span class="mx-1.5">/</span>
+      <span class="text-ink-700">Company profile</span>
+    </nav>
+    <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-ink-950">
+      {% if company %}Edit {{ company.name }}{% else %}Set up your company{% endif %}
+    </h1>
+    <p class="mt-2 text-sm text-ink-500">This profile is shown publicly on your company page and job listings.</p>
+  </div>
+</section>
+
+<div class="container-x py-10">
+  <form method="post" enctype="multipart/form-data" class="mx-auto max-w-3xl space-y-6" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <p class="card border-l-4 border-l-red-500 px-4 py-3 text-sm text-red-700">{{ form.non_field_errors.0 }}</p>
+    {% endif %}
+
+    <div class="card p-6 sm:p-8">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-ink-400">Identity</h2>
+      <div class="mt-5 grid gap-5 sm:grid-cols-2">
+        <div>
+          <label class="label" for="{{ form.name.id_for_label }}">Company name <span class="text-red-500">*</span></label>
+          {{ form.name|add_class:"field" }}
+          {% for error in form.name.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="label" for="{{ form.industry.id_for_label }}">Industry</label>
+          {{ form.industry|add_class:"field" }}
+          {% for error in form.industry.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="sm:col-span-2">
+          <label class="label" for="{{ form.tagline.id_for_label }}">Tagline</label>
+          {{ form.tagline|add_class:"field" }}
+          <p class="mt-1 text-xs text-ink-400">One short sentence that describes your company.</p>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="label" for="{{ form.description.id_for_label }}">About the company</label>
+          {{ form.description|add_class:"field" }}
+        </div>
+        <div>
+          <label class="label" for="{{ form.logo.id_for_label }}">Logo</label>
+          {{ form.logo|add_class:"field file:mr-3 file:rounded-lg file:border-0 file:bg-forest-50 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-forest-700" }}
+          {% for error in form.logo.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="label" for="{{ form.website.id_for_label }}">Website</label>
+          {{ form.website|add_class:"field" }}
+          {% for error in form.website.errors %}<p class="mt-1 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-6 sm:p-8">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-ink-400">Contact & location</h2>
+      <div class="mt-5 grid gap-5 sm:grid-cols-2">
+        <div>
+          <label class="label" for="{{ form.email.id_for_label }}">Contact email</label>
+          {{ form.email|add_class:"field" }}
+          <p class="mt-1 text-xs text-ink-400">Used for receiving application notifications.</p>
+        </div>
+        <div>
+          <label class="label" for="{{ form.phone.id_for_label }}">Phone</label>
+          {{ form.phone|add_class:"field" }}
+        </div>
+        <div>
+          <label class="label" for="{{ form.city.id_for_label }}">Headquarters city</label>
+          {{ form.city|add_class:"field" }}
+        </div>
+        <div>
+          <label class="label" for="{{ form.founded.id_for_label }}">Founded (year)</label>
+          {{ form.founded|add_class:"field" }}
+        </div>
+        <div class="sm:col-span-2">
+          <label class="label" for="{{ form.employees.id_for_label }}">Company size</label>
+          {{ form.employees|add_class:"field" }}
+          <p class="mt-1 text-xs text-ink-400">e.g. 1-50, 51-200, 201-1000, 1000+</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap justify-end gap-3 pb-4">
+      <a href="{% url 'accounts:employer_dashboard' %}" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary !px-8">
+        Save company profile {% include "partials/icon.html" with name="arrow-right" %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

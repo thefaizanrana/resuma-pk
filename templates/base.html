@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#06382c">
+  <title>{% block title %}{{ site_name }} — {{ site_tagline }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ site_name }} is Pakistan's job search engine. Find your next career move across Karachi, Lahore, Islamabad and beyond.{% endblock %}">
+  <meta name="keywords" content="jobs in Pakistan, Pakistan jobs, Karachi jobs, Lahore jobs, Islamabad jobs, hire in Pakistan">
+  <link rel="canonical" href="{% block canonical %}{{ request.build_absolute_uri }}{% endblock %}">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ site_name }}">
+  <meta property="og:title" content="{% block og_title %}{{ site_name }} — {{ site_tagline }}{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}{{ site_name }} connects Pakistani talent with the country's best opportunities.{% endblock %}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="flex min-h-screen flex-col">
+
+  {% include "partials/header.html" %}
+
+  {% if messages %}
+    <div class="container-x relative z-40 -mb-4 mt-4">
+      {% for message in messages %}
+        <div class="card flex items-center gap-3 border-l-4 border-l-forest-600 px-4 py-3 text-sm"
+             data-toast>
+          <span class="inline-flex h-2 w-2 rounded-full bg-forest-600"></span>
+          <span class="text-ink-800">{{ message }}</span>
+          <button type="button" class="ml-auto text-ink-400 hover:text-ink-700" data-dismiss-toast aria-label="Dismiss">
+            {% include "partials/icon.html" with name="close" class="h-4 w-4" %}
+          </button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "partials/footer.html" %}
+
+  <script src="{% static 'js/app.js' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

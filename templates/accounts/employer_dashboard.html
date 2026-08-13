@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load jobs_extras %}
+
+{% block title %}Employer dashboard — {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="border-b border-ink-900/5 bg-ink-950 text-white">
+  <div class="container-x flex flex-wrap items-center justify-between gap-6 py-12">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-forest-300">Employer dashboard</p>
+      <h1 class="mt-2 text-3xl font-extrabold tracking-tight">
+        {% if company %}{{ company.name }}{% else %}Welcome, {{ user.first_name|default:user.username }}{% endif %}
+      </h1>
+      <p class="mt-1.5 text-sm text-ink-300">
+        {% if company %}{{ active_jobs }} active job{{ active_jobs|pluralize }} · {{ total_applications }} total application{{ total_applications|pluralize }}{% else %}Set up your company to start hiring.{% endif %}
+      </p>
+    </div>
+    <div class="flex gap-2.5">
+      <a href="{% url 'accounts:company_setup' %}" class="btn btn-outline !border-white/15 !bg-white/5 !text-white hover:!border-forest-400 hover:!text-forest-300">
+        {% if company %}Edit company{% else %}Company profile{% endif %}
+      </a>
+      <a href="{% url 'accounts:job_create' %}" class="btn btn-gold">{% include "partials/icon.html" with name="plus" %}Post a job</a>
+    </div>
+  </div>
+</section>
+
+{% if not company %}
+<div class="container-x py-12">
+  <div class="card mx-auto max-w-xl p-10 text-center">
+    <span class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-forest-50 text-forest-600">
+      {% include "partials/icon.html" with name="building" class="h-7 w-7" %}
+    </span>
+    <h2 class="mt-5 text-xl font-bold text-ink-950">Create your company profile</h2>
+    <p class="mx-auto mt-2 max-w-sm text-sm text-ink-500">A complete company profile builds trust with applicants and is required before you can post jobs.</p>
+    <a href="{% url 'accounts:company_setup' %}" class="btn btn-primary mt-7">Set up company</a>
+  </div>
+</div>
+{% else %}
+
+<div class="container-x grid gap-4 py-10 sm:grid-cols-3">
+  <div class="card p-6">
+    <p class="text-sm text-ink-500">Active jobs</p>
+    <p class="mt-1.5 text-3xl font-extrabold tracking-tight text-forest-700">{{ active_jobs }}</p>
+  </div>
+  <div class="card p-6">
+    <p class="text-sm text-ink-500">Total jobs</p>
+    <p class="mt-1.5 text-3xl font-extrabold tracking-tight text-ink-950">{{ jobs.count }}</p>
+  </div>
+  <div class="card p-6">
+    <p class="text-sm text-ink-500">Applications</p>
+    <p class="mt-1.5 text-3xl font-extrabold tracking-tight text-gold-600">{{ total_applications }}</p>
+  </div>
+</div>
+
+<div class="container-x grid gap-8 pb-16 lg:grid-cols-[1fr_360px]">
+  <!-- My jobs -->
+  <section aria-labelledby="my-jobs-title">
+    <h2 id="my-jobs-title" class="text-lg font-bold text-ink-950">My job postings</h2>
+    {% if jobs %}
+      <div class="mt-4 space-y-3">
+        {% for job in jobs %}
+          <div class="card p-5 transition hover:shadow-md">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <a href="{{ job.get_absolute_url }}" class="font-semibold text-ink-950 hover:text-forest-700">{{ job.title }}</a>
+                  <span class="chip {% if job.status == 'active' %}bg-forest-50 text-forest-700{% else %}bg-ink-100 text-ink-500{% endif %}">
+                    {{ job.get_status_display }}
+                  </span>
+                  {% if job.is_featured %}
+                    <span class="chip bg-gold-200/70 text-gold-700">
+                      {% include "partials/icon.html" with name="spark" class="h-3 w-3" %}Featured
+                    </span>
+                  {% endif %}
+                </div>
+                <p class="mt-1.5 text-sm text-ink-500">{{ job.city }} · {{ job.get_job_type_display }} · {{ job.applicants }} applicant{{ job.applicants|pluralize }} · {{ job.posted_at|date:"M j" }}</p>
+              </div>
+              <div class="flex shrink-0 items-center gap-1.5">
+                <a href="{% url 'accounts:job_applicants' job.slug %}" class="btn btn-ghost !px-3 !py-2 text-xs">
+                  {% include "partials/icon.html" with name="users" class="h-4 w-4" %}Applicants
+                  {% if job.applicants %}<span class="rounded-full bg-forest-800 px-1.5 py-0.5 text-[10px] font-bold text-white">{{ job.applicants }}</span>{% endif %}
+                </a>
+                <a href="{% url 'accounts:job_update' job.slug %}" class="btn btn-ghost !px-3 !py-2 text-xs">Edit</a>
+                <button type="button" class="btn btn-ghost !px-3 !py-2 text-xs" data-toggle-job
+                        data-url="{% url 'accounts:job_toggle_status' job.slug %}">
+                  {% if job.status == 'active' %}Close{% else %}Reopen{% endif %}
+                </button>
+                <button type="button" class="btn btn-ghost !px-3 !py-2 text-xs !text-red-600 hover:!bg-red-50" data-delete-job
+                        data-url="{% url 'accounts:job_delete' job.slug %}" data-confirm="Delete this job permanently?">
+                  {% include "partials/icon.html" with name="x" class="h-3.5 w-3.5" %}
+                </button>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card mt-4 flex flex-col items-center px-6 py-14 text-center">
+        <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-forest-50 text-forest-600">
+          {% include "partials/icon.html" with name="briefcase" class="h-6 w-6" %}
+        </span>
+        <p class="mt-4 font-semibold text-ink-900">No jobs posted yet</p>
+        <p class="mt-1 text-sm text-ink-500">Post your first job and start receiving applications.</p>
+        <a href="{% url 'accounts:job_create' %}" class="btn btn-primary mt-6">Post a job</a>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- Recent applications -->
+  <aside aria-labelledby="recent-apps-title">
+    <h2 id="recent-apps-title" class="text-lg font-bold text-ink-950">Recent applications</h2>
+    {% if applications %}
+      <div class="mt-4 space-y-3">
+        {% for app in applications|slice:":6" %}
+          <div class="card p-4">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <p class="truncate text-sm font-semibold text-ink-950">{{ app.applicant.get_full_name|default:app.applicant.email }}</p>
+                <p class="mt-0.5 truncate text-xs text-ink-500">{{ app.job.title }}</p>
+              </div>
+              <span class="chip shrink-0 bg-ink-100 text-ink-600">{{ app.get_status_display }}</span>
+            </div>
+            <div class="mt-2.5 flex items-center justify-between text-xs text-ink-400">
+              <span>{{ app.applied_at|timesince }} ago</span>
+              <a href="{% url 'accounts:job_applicants' app.job.slug %}" class="font-semibold text-forest-700 hover:text-forest-800">View</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card mt-4 flex flex-col items-center px-6 py-10 text-center">
+        <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-ink-100 text-ink-400">
+          {% include "partials/icon.html" with name="users" class="h-5 w-5" %}
+        </span>
+        <p class="mt-3 text-sm font-medium text-ink-700">No applications yet</p>
+        <p class="mt-1 text-xs text-ink-400">They'll appear here as candidates apply.</p>
+      </div>
+    {% endif %}
+  </aside>
+</div>
+{% endif %}
+{% endblock %}

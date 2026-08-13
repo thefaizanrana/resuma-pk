@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of service — {{ site_name }}{% endblock %}
+{% block description %}The terms governing your use of Resuma.pk.{% endblock %}
+
+{% block content %}
+<section class="border-b border-ink-900/5 bg-white">
+  <div class="container-x py-10">
+    <h1 class="text-3xl font-extrabold tracking-tight text-ink-950 sm:text-4xl">Terms of service</h1>
+    <p class="mt-2 text-sm text-ink-500">Last updated: {% now "F j, Y" %}</p>
+  </div>
+</section>
+
+<section class="container-x max-w-3xl py-12">
+  <div class="prose-resuma">
+    <h2 class="text-xl font-bold text-ink-950">1. Acceptance of terms</h2>
+    <p>
+      By accessing www.resuma.pk ("Resuma", "the Service"), you agree to these Terms of Service. If you do not
+      agree, please do not use the Service.
+    </p>
+
+    <h2 class="text-xl font-bold text-ink-950">2. Description of service</h2>
+    <p>
+      Resuma is a job search engine that connects job seekers in Pakistan with employers. The Service provides
+      job listings, company profiles, applications and related tools for both candidates and employers.
+    </p>
+
+    <h2 class="text-xl font-bold text-ink-950">3. Accounts</h2>
+    <ul class="mt-3 space-y-2">
+      <li>· You must be at least 13 years old to use the Service.</li>
+      <li>· You are responsible for safeguarding your password and all activity under your account.</li>
+      <li>· You must provide accurate information when registering.</li>
+      <li>· One person may hold one account; creating duplicate accounts is not permitted.</li>
+    </ul>
+
+    <h2 class="text-xl font-bold text-ink-950">4. Acceptable use</h2>
+    <p>You agree not to:</p>
+    <ul class="mt-3 space-y-2">
+      <li>· Post fraudulent, misleading or unlawful job listings.</li>
+      <li>· Impersonate any person or company.</li>
+      <li>· Scrape, harvest or otherwise copy listings at scale without permission.</li>
+      <li>· Upload malware, or attempt to disrupt, overload or compromise the Service.</li>
+      <li>· Discriminate against candidates in violation of Pakistani law.</li>
+    </ul>
+
+    <h2 class="text-xl font-bold text-ink-950">5. Job listings</h2>
+    <p>
+      Employers are solely responsible for the content they post. Resuma reserves the right to remove any
+      listing that violates these terms or applicable law. Listings do not constitute an offer of employment —
+      hiring decisions are made between employer and candidate.
+    </p>
+
+    <h2 class="text-xl font-bold text-ink-950">6. Applications and resumes</h2>
+    <p>
+      When you apply for a job, your application data is shared with that employer for recruitment purposes only.
+      Resuma is not a party to any employment relationship and is not responsible for employer conduct.
+    </p>
+
+    <h2 class="text-xl font-bold text-ink-950">7. Intellectual property</h2>
+    <p>
+      The Resuma name, logo, design and software are owned by Resuma.pk. You may not copy or reuse them without
+      written permission.
+    </p>
+
+    <h2 class="text-xl font-bold text-ink-950">8. Disclaimer of warranties</h2>
+    <p>
+      The Service is provided "as is". While we work hard to keep listings accurate and current, we do not
+      guarantee the accuracy, completeness or availability of any job listing.
+    </p>
+
+    <h2 class="text-xl font-bold text-ink-950">9. Limitation of liability</h2>
+    <p>
+      To the maximum extent permitted by law, Resuma.pk shall not be liable for any indirect, incidental or
+      consequential damages arising from your use of the Service, including from a hiring decision.
+    </p>
+
+    <h2 class="text-xl font-bold text-ink-950">10. Termination</h2>
+    <p>
+      We may suspend or terminate accounts that violate these terms. You may delete your account at any time by
+      contacting hello@resuma.pk.
+    </p>
+
+    <h2 class="text-xl font-bold text-ink-950">11. Changes to these terms</h2>
+    <p>
+      We may update these terms from time to time. Material changes will be announced on the Service or by email.
+      Continued use after changes constitutes acceptance.
+    </p>
+
+    <h2 class="text-xl font-bold text-ink-950">12. Contact</h2>
+    <p>
+      Questions? Email <a href="mailto:{{ site_email }}" class="font-semibold text-forest-700 hover:text-forest-800">{{ site_email }}</a>
+      or call +92 331 7868071.
+    </p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% if page_obj.paginator.num_pages > 1 %}
+<nav class="mt-12 flex items-center justify-center gap-2" aria-label="Pagination">
+  {% if page_obj.has_previous %}
+    <a class="btn btn-outline !px-3.5" href="?{{ querystring }}page={{ page_obj.previous_page_number }}" rel="prev" aria-label="Previous page">
+      {% include "partials/icon.html" with name="chevron-left" %}
+    </a>
+  {% else %}
+    <span class="btn btn-outline !px-3.5 opacity-40" aria-disabled="true">{% include "partials/icon.html" with name="chevron-left" %}</span>
+  {% endif %}
+
+  {% for num in page_obj.paginator.page_range %}
+    {% if num == page_obj.number %}
+      <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-forest-800 text-sm font-bold text-white" aria-current="page">{{ num }}</span>
+    {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+      <a class="flex h-10 w-10 items-center justify-center rounded-xl border border-ink-900/10 bg-white text-sm font-medium text-ink-700 transition hover:border-forest-600 hover:text-forest-700"
+         href="?{{ querystring }}page={{ num }}">{{ num }}</a>
+    {% endif %}
+  {% endfor %}
+
+  {% if page_obj.has_next %}
+    <a class="btn btn-outline !px-3.5" href="?{{ querystring }}page={{ page_obj.next_page_number }}" rel="next" aria-label="Next page">
+      {% include "partials/icon.html" with name="chevron-right" %}
+    </a>
+  {% else %}
+    <span class="btn btn-outline !px-3.5 opacity-40" aria-disabled="true">{% include "partials/icon.html" with name="chevron-right" %}</span>
+  {% endif %}
+</nav>
+{% endif %}

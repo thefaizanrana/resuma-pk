@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Something went wrong — {{ site_name }}{% endblock %}
+{% block content %}
+<section class="container-x flex items-center justify-center py-24 sm:py-32">
+  <div class="max-w-lg text-center">
+    <p class="text-7xl font-extrabold tracking-tight text-gold-600 sm:text-8xl">500</p>
+    <h1 class="mt-4 text-2xl font-bold tracking-tight text-ink-950">Something went wrong on our side</h1>
+    <p class="mt-2 text-sm text-ink-500">An unexpected error occurred. Our team has been notified — please try again in a moment.</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a href="{% url 'jobs:home' %}" class="btn btn-primary">Back to home</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
