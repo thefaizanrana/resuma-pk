@@ -79,7 +79,7 @@
         <p class="mt-1 text-xs text-ink-400 sm:text-sm">Live jobs</p>
       </div>
       <div>
-        <p class="text-2xl font-extrabold tracking-tight text-forest-300 sm:text-3xl">{{ companies|length }}+</p>
+        <p class="text-2xl font-extrabold tracking-tight text-forest-300 sm:text-3xl">{{ total_companies }}+</p>
         <p class="mt-1 text-xs text-ink-400 sm:text-sm">Hiring companies</p>
       </div>
       <div>
@@ -109,7 +109,7 @@
           {% include "partials/icon.html" with name="briefcase" class="h-4.5 w-4.5" %}
         </span>
         <span class="min-w-0">
-          <span class="block truncate text-sm font-semibold text-ink-900">{{ item.get_category_display }}</span>
+          <span class="block truncate text-sm font-semibold text-ink-900">{{ item.label }}</span>
           <span class="text-xs text-ink-400">{{ item.count }} open</span>
         </span>
       </a>

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load jobs_extras %}
+
+{% block title %}Browse jobs by category — {{ site_name }}{% endblock %}
+{% block description %}Explore jobs by field — engineering, design, marketing, finance, healthcare and more across Pakistan.{% endblock %}
+
+{% block content %}
+<section class="border-b border-ink-900/5 bg-white">
+  <div class="container-x py-10">
+    <nav class="text-xs text-ink-400" aria-label="Breadcrumb">
+      <a href="{% url 'jobs:home' %}" class="hover:text-forest-700">Home</a>
+      <span class="mx-1.5">/</span>
+      <span class="text-ink-700">Categories</span>
+    </nav>
+    <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-ink-950 sm:text-4xl">Browse by category</h1>
+    <p class="mt-2 max-w-2xl text-sm text-ink-500">
+      Find roles that match your field. Every category links straight to the latest openings across Pakistan.
+    </p>
+  </div>
+</section>
+
+<section class="container-x py-12">
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {% for cat in categories %}
+      <a href="{% url 'jobs:job_list' %}?category={{ cat.value }}" class="group card flex items-center gap-4 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-forest-600/30 hover:shadow-lg hover:shadow-forest-900/8">
+        <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-forest-700 to-forest-900 text-forest-200 transition group-hover:scale-105">
+          {% include "partials/icon.html" with name=cat.icon class="h-5 w-5" %}
+        </span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-[15px] font-semibold text-ink-950 group-hover:text-forest-700">{{ cat.label }}</span>
+          <span class="text-xs text-ink-400">{{ cat.count }} open role{{ cat.count|pluralize }}</span>
+        </span>
+        {% include "partials/icon.html" with name="arrow-right" class="h-4 w-4 text-ink-300 transition group-hover:translate-x-1 group-hover:text-forest-600" %}
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -199,3 +199,39 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.applicant} -> {self.job}"
+
+
+class JobAlert(models.Model):
+    """A saved search subscription (job alerts) by email."""
+
+    email = models.EmailField()
+    query = models.CharField(max_length=120, blank=True, help_text="Keyword search.")
+    city = models.CharField(max_length=60, blank=True)
+    category = models.CharField(max_length=40, choices=CATEGORY_CHOICES, blank=True)
+    job_type = models.CharField(max_length=20, choices=JobType.choices, blank=True)
+    frequency = models.CharField(
+        max_length=10, choices=[("daily", "Daily"), ("weekly", "Weekly")], default="weekly"
+    )
+    token = models.CharField(max_length=64, unique=True, blank=True)
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["email", "query", "city", "category", "job_type"],
+                name="uniq_job_alert_subscription",
+            )
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            import uuid
+
+            self.token = uuid.uuid4().hex
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        label = self.query or self.category or self.city or "all jobs"
+        return f"Alert for {self.email}: {label}"

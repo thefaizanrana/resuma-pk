@@ -37,7 +37,18 @@
 </div>
 {% else %}
 
-<div class="container-x grid gap-4 py-10 sm:grid-cols-3">
+<div class="container-x grid gap-8 pb-16 lg:grid-cols-[220px_1fr]">
+  <aside class="lg:sticky lg:top-24 lg:self-start">
+    <nav class="card flex gap-1 overflow-x-auto p-2 lg:flex-col lg:overflow-visible" aria-label="Dashboard sections">
+      <a class="nav-link whitespace-nowrap nav-link-active" href="{% url 'accounts:employer_dashboard' %}">Overview</a>
+      <a class="nav-link whitespace-nowrap" href="{% url 'accounts:job_create' %}">Post a job</a>
+      <a class="nav-link whitespace-nowrap" href="{% url 'accounts:company_setup' %}">Company profile</a>
+      <a class="nav-link whitespace-nowrap" href="{% url 'accounts:seeker_dashboard' %}">Browse candidates</a>
+    </nav>
+  </aside>
+
+  <div class="min-w-0 space-y-8">
+  <div class="grid gap-4 sm:grid-cols-3">
   <div class="card p-6">
     <p class="text-sm text-ink-500">Active jobs</p>
     <p class="mt-1.5 text-3xl font-extrabold tracking-tight text-forest-700">{{ active_jobs }}</p>
@@ -137,6 +148,8 @@
       </div>
     {% endif %}
   </aside>
+</div>
+  </div>
 </div>
 {% endif %}
 {% endblock %}

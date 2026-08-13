@@ -41,29 +41,32 @@
           {{ job.company.name }}
         </a>
       </div>
-      <div class="flex shrink-0 flex-col gap-2.5 sm:flex-row md:flex-col lg:flex-row">
-        {% if request.user.is_authenticated %}
-          <button type="button" class="btn btn-outline" data-save-job="{{ job.slug }}"
-                  data-url="{% url 'jobs:save_job' job.slug %}"
-                  aria-pressed="{% if is_saved %}true{% else %}false{% endif %}">
-            <span class="{% if is_saved %}text-forest-600{% else %}text-ink-400{% endif %}" data-save-icon>
-              {% if is_saved %}{% include "partials/icon.html" with name="bookmark-filled" %}{% else %}{% include "partials/icon.html" with name="bookmark" %}{% endif %}
-            </span>
-            <span data-save-text>{% if is_saved %}Saved{% else %}Save job{% endif %}</span>
-          </button>
-        {% endif %}
-        {% if job.apply_method == "url" and job.apply_url %}
-          <a href="{{ job.apply_url }}" target="_blank" rel="noopener noreferrer nofollow" class="btn btn-primary">
-            Apply on website {% include "partials/icon.html" with name="external" %}
-          </a>
-        {% elif has_applied %}
-          <span class="btn btn-outline cursor-default !text-forest-700">
-            {% include "partials/icon.html" with name="check" %}Applied
-          </span>
-        {% else %}
-          <button type="button" class="btn btn-primary" data-open-apply>Apply now {% include "partials/icon.html" with name="arrow-right" %}</button>
-        {% endif %}
-      </div>
+       <div class="flex shrink-0 flex-col gap-2.5 sm:flex-row md:flex-col lg:flex-row">
+         {% if request.user.is_authenticated %}
+           <button type="button" class="btn btn-outline" data-save-job="{{ job.slug }}"
+                   data-url="{% url 'jobs:save_job' job.slug %}"
+                   aria-pressed="{% if is_saved %}true{% else %}false{% endif %}">
+             <span class="{% if is_saved %}text-forest-600{% else %}text-ink-400{% endif %}" data-save-icon>
+               {% if is_saved %}{% include "partials/icon.html" with name="bookmark-filled" %}{% else %}{% include "partials/icon.html" with name="bookmark" %}{% endif %}
+             </span>
+             <span data-save-text>{% if is_saved %}Saved{% else %}Save job{% endif %}</span>
+           </button>
+         {% endif %}
+         {% if job.apply_method == "url" and job.apply_url %}
+           <a href="{{ job.apply_url }}" target="_blank" rel="noopener noreferrer nofollow" class="btn btn-primary">
+             Apply on website {% include "partials/icon.html" with name="external" %}
+           </a>
+         {% elif has_applied %}
+           <span class="btn btn-outline cursor-default !text-forest-700">
+             {% include "partials/icon.html" with name="check" %}Applied
+           </span>
+         {% else %}
+           <button type="button" class="btn btn-primary" data-open-apply>Apply now {% include "partials/icon.html" with name="arrow-right" %}</button>
+         {% endif %}
+         <button type="button" class="btn btn-ghost" data-share aria-label="Copy link to this job">
+           {% include "partials/icon.html" with name="link" class="h-4 w-4" %}Share
+         </button>
+       </div>
     </div>
 
     <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-ink-900/5 pt-6 sm:grid-cols-4">

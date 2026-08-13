@@ -24,7 +24,8 @@ environ.Env.read_env(BASE_DIR / ".env")
 # Core
 # ---------------------------------------------------------------------------
 SECRET_KEY = env(
-    "SECRET_KEY", default="django-insecure-change-me-in-production-please"
+    "SECRET_KEY",
+    default="p7-xsx!dl=jgr)s@r3l_qb!=&vf3ln938%at+y#@$=893$kr4s",
 )
 
 DEBUG = env.bool("DEBUG", default=False)

@@ -10,11 +10,15 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .choices import ApplyMethod, JobStatus
-from .forms import ApplicationForm, CompanyForm, JobForm, SearchForm
-from .models import Application, Company, Job, SavedJob
+from .choices import ApplyMethod, CATEGORY_CHOICES, JobStatus
+from .forms import ApplicationForm, CompanyForm, JobAlertForm, JobForm, SearchForm
+from .models import Application, Company, Job, JobAlert, SavedJob
 
 JOBS_PER_PAGE = 12
+
+
+def _category_label(value):
+    return dict(CATEGORY_CHOICES).get(value, value)
 
 
 def home(request):
@@ -25,12 +29,15 @@ def home(request):
         .filter(job_count__gt=0)
         .order_by("-job_count")[:8]
     )
-    categories = (
-        Job.objects.active()
-        .values("category")
-        .annotate(count=Count("id"))
-        .order_by("-count")[:8]
-    )
+    category_counts = {
+        item["category"]: item["count"]
+        for item in Job.objects.active().values("category").annotate(count=Count("id"))
+    }
+    categories = [
+        {"value": value, "label": label, "count": category_counts.get(value, 0)}
+        for value, label in CATEGORY_CHOICES
+        if category_counts.get(value, 0) > 0
+    ][:8]
     cities = (
         Job.objects.active()
         .values("city")
@@ -48,8 +55,52 @@ def home(request):
             "categories": categories,
             "cities": cities,
             "total_jobs": total_jobs,
+            "total_companies": Company.objects.count(),
             "search_form": SearchForm(request.GET),
         },
+    )
+
+
+def categories(request):
+    counts = {
+        item["category"]: item["count"]
+        for item in Job.objects.active().values("category").annotate(count=Count("id"))
+    }
+    categories = [
+        {
+            "value": value,
+            "label": label,
+            "count": counts.get(value, 0),
+            "icon": icon,
+        }
+        for value, label, icon in [
+            ("engineering", "Engineering & Tech", "code"),
+            ("design", "Design & UX", "palette"),
+            ("marketing", "Marketing & Sales", "megaphone"),
+            ("finance", "Finance & Accounting", "banknote"),
+            ("healthcare", "Healthcare & Medicine", "heart"),
+            ("education", "Education & Training", "book"),
+            ("operations", "Operations & Admin", "settings"),
+            ("customer", "Customer Support", "headset"),
+            ("sales", "Sales", "trending-up"),
+            ("writing", "Writing & Content", "pen"),
+            ("legal", "Legal", "scale"),
+            ("hr", "Human Resources", "users"),
+            ("other", "Other", "briefcase"),
+        ]
+        if value in dict(CATEGORY_CHOICES)
+    ]
+    return render(request, "jobs/categories.html", {"categories": categories})
+
+
+@require_POST
+def job_alert(request):
+    form = JobAlertForm(request.POST)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({"ok": True, "message": "You're subscribed. Watch your inbox!"})
+    return JsonResponse(
+        {"ok": False, "message": "Please enter a valid email address."}, status=400
     )
 
 
@@ -320,6 +371,17 @@ def application_status(request, pk):
         return HttpResponseBadRequest("Invalid status")
     application.status = status
     application.save(update_fields=["status"])
+
+    send_mail(
+        f"Update on your application for {application.job.title}",
+        f"Hi {application.applicant.get_full_name() or application.applicant.username},\n\n"
+        f"Your application to {application.job.company.name} for "
+        f"'{application.job.title}' is now marked as: {application.get_status_display()}.\n\n"
+        f"We'll keep you posted on any further updates. Thanks for using Resuma.pk!",
+        None,
+        [application.email],
+        fail_silently=True,
+    )
     return JsonResponse({"status": application.status})
 
 

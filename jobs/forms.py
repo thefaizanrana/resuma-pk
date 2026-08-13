@@ -6,7 +6,7 @@ from .choices import (
     ExperienceLevel,
     JobType,
 )
-from .models import Application, Company, Job
+from .models import Application, Company, Job, JobAlert
 
 
 class SearchForm(forms.Form):
@@ -69,6 +69,19 @@ class JobForm(forms.ModelForm):
         if cleaned.get("salary_min") and cleaned.get("salary_max") and cleaned.get("salary_min") > cleaned.get("salary_max"):
             self.add_error("salary_min", "Minimum salary cannot exceed maximum.")
         return cleaned
+
+
+class JobAlertForm(forms.ModelForm):
+    class Meta:
+        model = JobAlert
+        fields = ("email", "query", "city", "category", "job_type", "frequency")
+        widgets = {
+            "email": forms.EmailInput(attrs={"placeholder": "you@example.com"}),
+            "query": forms.TextInput(attrs={"placeholder": "e.g. Django developer"}),
+        }
+
+    def clean_email(self):
+        return self.cleaned_data["email"].strip().lower()
 
 
 class CompanyForm(forms.ModelForm):

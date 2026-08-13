@@ -78,41 +78,54 @@
     </form>
   </aside>
 
-  <!-- ============ RESULTS ============ -->
-  <div>
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <p class="text-sm text-ink-500">Showing <span class="font-semibold text-ink-900">{{ page_obj.object_list|length }}</span> of {{ total }}</p>
-      <div class="flex items-center gap-2">
-        <label for="sort" class="text-sm text-ink-500">Sort</label>
-        <select id="sort" name="sort" form="sort-form" class="field !w-auto !py-2" onchange="this.form.submit()">
-          <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest first</option>
-          <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest first</option>
-          <option value="salary" {% if sort == 'salary' %}selected{% endif %}>Highest salary</option>
-        </select>
-      </div>
-    </div>
+   <!-- ============ RESULTS ============ -->
+   <div data-results>
+     <div class="flex flex-wrap items-center justify-between gap-3">
+       <p class="text-sm text-ink-500">Showing <span class="font-semibold text-ink-900">{{ page_obj.object_list|length }}</span> of {{ total }}</p>
+       <div class="flex items-center gap-2">
+         <label for="sort" class="text-sm text-ink-500">Sort</label>
+         <select id="sort" name="sort" form="sort-form" class="field !w-auto !py-2" onchange="this.form.submit()">
+           <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest first</option>
+           <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest first</option>
+           <option value="salary" {% if sort == 'salary' %}selected{% endif %}>Highest salary</option>
+         </select>
+       </div>
+     </div>
 
-    <form id="sort-form" method="get" action="{% url 'jobs:job_list' %}" class="hidden" aria-hidden="true">
-      {% if form.is_valid %}{% for key, value in form.cleaned_data.items %}{% if value %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}{% endfor %}{% endif %}
-      <input type="hidden" name="sort" value="{{ sort }}">
-    </form>
+     {% if form.q.value or form.city.value or form.job_type.value or form.experience.value or form.category.value %}
+     <div class="mt-3 flex flex-wrap items-center gap-2">
+       {% with base="/jobs/" %}
+       {% if form.q.value %}<a href="{{ base }}?{% for k,v in form.cleaned_data.items %}{% if v and k != 'q' %}{{ k }}={{ v|urlencode }}&{% endif %}{% endfor %}" class="chip bg-forest-50 text-forest-700">“{{ form.q.value }}” {% include "partials/icon.html" with name="x" class="h-3 w-3" %}</a>{% endif %}
+       {% if form.city.value %}<a href="{{ base }}?{% for k,v in form.cleaned_data.items %}{% if v and k != 'city' %}{{ k }}={{ v|urlencode }}&{% endif %}{% endfor %}" class="chip bg-forest-50 text-forest-700">{{ form.city.value }} {% include "partials/icon.html" with name="x" class="h-3 w-3" %}</a>{% endif %}
+       {% if form.job_type.value %}<a href="{{ base }}?{% for k,v in form.cleaned_data.items %}{% if v and k != 'job_type' %}{{ k }}={{ v|urlencode }}&{% endif %}{% endfor %}" class="chip bg-forest-50 text-forest-700">{{ form.get_job_type_display }} {% include "partials/icon.html" with name="x" class="h-3 w-3" %}</a>{% endif %}
+       {% if form.experience.value %}<a href="{{ base }}?{% for k,v in form.cleaned_data.items %}{% if v and k != 'experience' %}{{ k }}={{ v|urlencode }}&{% endif %}{% endfor %}" class="chip bg-forest-50 text-forest-700">{{ form.get_experience_display }} {% include "partials/icon.html" with name="x" class="h-3 w-3" %}</a>{% endif %}
+       {% if form.category.value %}<a href="{{ base }}?{% for k,v in form.cleaned_data.items %}{% if v and k != 'category' %}{{ k }}={{ v|urlencode }}&{% endif %}{% endfor %}" class="chip bg-forest-50 text-forest-700">{{ form.get_category_display }} {% include "partials/icon.html" with name="x" class="h-3 w-3" %}</a>{% endif %}
+       {% endwith %}
+       <a href="{% url 'jobs:job_list' %}" class="text-xs font-semibold text-forest-700 underline-offset-2 hover:underline">Clear all</a>
+     </div>
+     {% endif %}
 
-    <div class="mt-5 space-y-4">
-      {% for job in page_obj %}
-        {% include "partials/job_card.html" %}
-      {% empty %}
-        <div class="card flex flex-col items-center px-6 py-16 text-center">
-          <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-forest-50 text-forest-600">
-            {% include "partials/icon.html" with name="search" class="h-6 w-6" %}
-          </span>
-          <h2 class="mt-4 text-lg font-bold text-ink-950">No jobs match your filters</h2>
-          <p class="mt-1.5 max-w-sm text-sm text-ink-500">Try widening your search — remove a filter or search a different keyword.</p>
-          <a href="{% url 'jobs:job_list' %}" class="btn btn-primary mt-6">Browse all jobs</a>
-        </div>
-      {% endfor %}
-    </div>
+     <form id="sort-form" method="get" action="{% url 'jobs:job_list' %}" class="hidden" aria-hidden="true">
+       {% if form.is_valid %}{% for key, value in form.cleaned_data.items %}{% if value %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}{% endfor %}{% endif %}
+       <input type="hidden" name="sort" value="{{ sort }}">
+     </form>
 
-    {% include "partials/pagination.html" %}
-  </div>
+     <div class="mt-5 space-y-4">
+       {% for job in page_obj %}
+         {% include "partials/job_card.html" %}
+       {% empty %}
+         <div class="card flex flex-col items-center px-6 py-16 text-center">
+           <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-forest-50 text-forest-600">
+             {% include "partials/icon.html" with name="search" class="h-6 w-6" %}
+           </span>
+           <h2 class="mt-4 text-lg font-bold text-ink-950">No jobs match your filters</h2>
+           <p class="mt-1.5 max-w-sm text-sm text-ink-500">Try widening your search — remove a filter or search a different keyword.</p>
+           <a href="{% url 'jobs:job_list' %}" class="btn btn-primary mt-6">Browse all jobs</a>
+         </div>
+       {% endfor %}
+     </div>
+
+     {% include "partials/pagination.html" %}
+   </div>
 </div>
 {% endblock %}
