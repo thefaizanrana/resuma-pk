@@ -5,6 +5,7 @@ Settings are environment-driven via .env (see .env.example).
 
 from pathlib import Path
 
+import dj_database_url
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,19 +16,40 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, []),
     CSRF_TRUSTED_ORIGINS=(list, []),
     DATABASE_URL=(str, ""),
+    DEFAULT_FILE_STORAGE=(str, "django.core.files.storage.FileSystemStorage"),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
 # ---------------------------------------------------------------------------
 # Core
 # ---------------------------------------------------------------------------
-SECRET_KEY = env("SECRET_KEY", default="django-insecure-dev-only-change-me")
+SECRET_KEY = env(
+    "SECRET_KEY", default="django-insecure-change-me-in-production-please"
+)
 
 DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
+# Domains the app answers to. Override with ALLOWED_HOSTS (comma-separated) in
+# production. The wildcard `.vercel.app` covers every Vercel deployment URL.
+ALLOWED_HOSTS = env.list(
+    "ALLOWED_HOSTS",
+    default=[
+        "localhost",
+        "127.0.0.1",
+        "www.resuma.pk",
+        "resuma.pk",
+        ".vercel.app",
+    ],
+)
 
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+CSRF_TRUSTED_ORIGINS = env.list(
+    "CSRF_TRUSTED_ORIGINS",
+    default=[
+        "https://www.resuma.pk",
+        "https://resuma.pk",
+        "https://*.vercel.app",
+    ],
+)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -76,10 +98,14 @@ WSGI_APPLICATION = "config.wsgi.application"
 AUTH_USER_MODEL = "accounts.User"
 
 # ---------------------------------------------------------------------------
-# Database - SQLite locally, PostgreSQL via DATABASE_URL in production
+# Database - SQLite locally, PostgreSQL via DATABASE_URL in production.
+# Set DATABASE_URL (e.g. a Neon Postgres connection string) in the host env.
 # ---------------------------------------------------------------------------
-if env("DATABASE_URL"):
-    DATABASES = {"default": env.db("DATABASE_URL")}
+db_url = env("DATABASE_URL", default="")
+if db_url:
+    DATABASES = {
+        "default": dj_database_url.parse(db_url, conn_max_age=600, ssl_require=True)
+    }
 else:
     DATABASES = {
         "default": {
@@ -118,20 +144,20 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
-    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "default": {
+        "BACKEND": env(
+            "DEFAULT_FILE_STORAGE",
+            default="django.core.files.storage.FileSystemStorage",
+        ),
+    },
     "staticfiles": {
         "BACKEND": (
-            "whitenoise.storage.CompressedStaticFilesStorage"
+            "whitenoise.storage.CompressedManifestStaticFilesStorage"
             if not DEBUG
             else "django.contrib.staticfiles.storage.StaticFilesStorage"
         ),
     },
 }
-
-# In production, use hashed, compressed, cache-busted static files (requires
-# `collectstatic` at build time — see README / vercel.json).
-if not DEBUG:
-    STORAGES["staticfiles"]["BACKEND"] = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
