@@ -116,7 +116,7 @@ To rebuild after editing `input.css` or templates: `npm run build:css`.
 
 For a real production database, persistent disk and simpler Postgres, use Render or Railway:
 
-- `render.yaml` + `Procfile` + `build.sh` are provided.
+- `render.example.yaml` + `Procfile.example` + `build.sh` are provided as a ready-to-use template.
 - On Render: create a Web Service from the repo, add a Postgres instance, and it auto-wires `DATABASE_URL`.
 - `gunicorn config.wsgi:application` is the entrypoint.
 
