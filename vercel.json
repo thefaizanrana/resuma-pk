@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build:css && python manage.py collectstatic --noinput && python manage.py migrate --noinput",
+  "functions": {
+    "config/wsgi.py": {
+      "runtime": "@vercel/python@4.0.0"
+    }
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "config/wsgi.py"
+    }
+  ]
+}

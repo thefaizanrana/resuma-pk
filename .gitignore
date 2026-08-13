@@ -1,0 +1,39 @@
+# Django
+*.log
+*.pot
+*.py[co]
+__pycache__/
+.env
+.env.*
+!.env.example
+
+# Database
+*.sqlite3
+db.sqlite3
+db.sqlite3-journal
+
+# Static / media
+staticfiles/
+media/
+static/admin/
+
+# Node / Tailwind
+node_modules/
+package-lock.json
+
+# Vercel
+.vercel/
+
+# Original logo source files (we ship the processed asset under static/images/)
+Resuma*.png
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/

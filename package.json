@@ -1,0 +1,18 @@
+{
+  "name": "resuma-pk",
+  "version": "1.0.0",
+  "description": "Resuma.pk — Pakistan's job search engine (Django + Tailwind).",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i static/css/input.css -o static/css/tailwind.css --minify",
+    "watch:css": "tailwindcss -i static/css/input.css -o static/css/tailwind.css --watch",
+    "build": "npm run build:css",
+    "vercel-build": "npm run build:css && python manage.py collectstatic --noinput && python manage.py migrate --noinput"
+  },
+  "keywords": ["django", "jobs", "pakistan", "tailwind"],
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

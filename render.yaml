@@ -1,0 +1,40 @@
+# Render.com configuration (recommended for Resuma.pk in production)
+# Free tier: render.com web service + render.com Postgres (or use Neon/Supabase).
+#
+# How to deploy:
+#   1. Push this repo to GitHub.
+#   2. Create a new "Web Service" on Render, connect the repo.
+#   3. Set build command:  ./build.sh
+#   4. Set start command: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+#   5. Add a Render Postgres instance and copy its internal URL into DATABASE_URL.
+#   6. Set the environment variables below in the Render dashboard.
+
+services:
+  - type: web
+    name: resuma-pk
+    runtime: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2"
+    healthCheckPath: "/"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: resuma-pk-db
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        value: "resuma-pk.onrender.com,www.resuma.pk,resuma.pk"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://www.resuma.pk,https://resuma.pk"
+
+  - type: postgres
+    name: resuma-pk-db
+    plan: free
+    databaseName: resuma
+    user: resuma
